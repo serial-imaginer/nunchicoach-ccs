@@ -4,62 +4,292 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>눈치코치 상담 편의점</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-    .animate-float {
-      animation: float 2s ease-in-out infinite;
-    }
-    @keyframes fadeInSlide {
-      from {
-        opacity: 0;
-        transform: translateY(-4px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .animate-fade-in {
-      animation: fadeInSlide 0.3s ease-out forwards;
-    }
-  </style>
+  <!-- React & ReactDOM (UMD) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel Standalone (브라우저에서 JSX 즉시 실행용) -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="bg-black">
-  <div class="min-h-screen bg-black overflow-y-auto flex flex-col items-center py-[1.5cm] px-4">
-    
-    <!-- Mobile Phone Frame: Centered, tall, with black background and yellow border -->
-    <div class="relative w-full max-w-md mx-auto bg-black border-4 border-yellow-400 
-                rounded-[3rem] flex flex-col p-6 shadow-2xl shadow-yellow-800/50 flex-shrink-0">
-      
-      <!-- Main Content Area within phone frame -->
-      <div class="flex flex-col items-center w-full">
-        
-        <!-- Header -->
-        <header class="w-[85%] mx-auto text-center mt-3 mb-8 overflow-hidden">
-          <h1 class="text-xl sm:text-3xl font-extrabold text-yellow-400 
-                     drop-shadow-[0_0_10px_rgba(250,204,21,0.8)] mb-2 whitespace-nowrap">
-            눈치코치 상담 편의점
-          </h1>
-          <p class="text-[10px] sm:text-[15px] text-blue-400 whitespace-nowrap">
-            당신의 고민과 궁금증, 24시간 자판기로 해결!
-          </p>
-          <div class="w-full h-1 bg-yellow-400 mt-6"></div>
-        </header>
+  <div id="root"></div>
 
-        <!-- Navigation Menu (Vending Machine Buttons) -->
-        <nav class="w-[85%] mx-auto space-y-4">
-          
-          <!-- 운세 자판기 -->
-          <div class="relative w-full">
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 bg-red-500 rounded-full w-12 h-12 flex items-center justify-center animate-pulse z-10 border border-black">
-              <span class="text-white text-sm font-bold">무료</span>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const App = () => {
+      const [showCoffeeMsg, setShowCoffeeMsg] = useState(false);
+      const [showInfo, setShowInfo] = useState(false);
+      const [copied, setCopied] = useState(false);
+      const highlightWords = ["운세", "해몽", "선물", "메뉴", "주역", "행운"];
+      // Changed from yellow-100 neon to solid white for a clean look
+      const neonClass = "text-white";
+
+      // Helper function to render text with highlighted keywords
+      const renderHighlightedText = (text) => {
+        let parts = [text];
+        
+        highlightWords.forEach(word => {
+          const newParts = [];
+          parts.forEach(part => {
+            if (typeof part === 'string') {
+              const segments = part.split(word);
+              segments.forEach((segment, i) => {
+                if (segment) {
+                  newParts.push(segment);
+                }
+                if (i < segments.length - 1) {
+                  newParts.push(<span key={`${word}-${i}`} className={neonClass}>{word}</span>);
+                }
+              });
+            } else {
+              newParts.push(part);
+            }
+          });
+          parts = newParts;
+        });
+        return parts;
+      };
+
+      const vendingMachineButtons = [
+        { 
+          label: "눈치코치 운세 자판기", 
+          colorClass: "bg-purple-600 hover:bg-purple-500 border-b-4 border-purple-800 active:translate-y-1 active:border-b-0",
+          url: "https://fortune.nunchicoach.com"
+        },
+        { 
+          label: "눈치코치 해몽 자판기", 
+          colorClass: "bg-blue-600 hover:bg-blue-500 border-b-4 border-blue-800 active:translate-y-1 active:border-b-0",
+          url: "https://dream.nunchicoach.com"
+        },
+        { 
+          label: "눈치코치 주역 자판기", 
+          colorClass: "bg-[#FE5950] hover:bg-[#ff7068] border-b-4 border-[#c6463e] active:translate-y-1 active:border-b-0",
+          url: "https://change.nunchicoach.com"
+        },
+      ];
+
+      const subtitleText = "당신의 고민과 궁금증, 24시간 자판기로 해결!";
+
+      const handleSSSClick = () => {
+        window.open('https://www.amazon.com/dp/B0DCZSW5DG?binding=kindle_edition&ref_=ast_author_bsi', '_blank');
+      };
+
+      const handleCoffeeClick = () => {
+        setShowCoffeeMsg(!showCoffeeMsg);
+        if (showCoffeeMsg) setCopied(false);
+      };
+
+      const handleCopyAccount = () => {
+        const accountNumber = "1002-4188-2942";
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(accountNumber);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = accountNumber;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textarea);
+        }
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
+      return (
+        <div className="min-h-screen bg-black overflow-y-auto flex flex-col items-center py-[1.5cm] px-4">
+          {/* Custom Floating Animation for the Coffee Cup */}
+          <style>
+            {`
+              @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+              }
+              .animate-float {
+                animation: float 2s ease-in-out infinite;
+              }
+            `}
+          </style>
+
+          {/* Mobile Phone Frame: Centered, tall, with black background and yellow border */}
+          <div className="relative w-full max-w-md mx-auto bg-black border-4 border-yellow-400 
+                      rounded-[3rem] flex flex-col p-6 shadow-2xl shadow-yellow-800/50 flex-shrink-0">
+            
+            {/* Main Content Area within phone frame */}
+            <div className="flex flex-col items-center w-full">
+              {/* Header */}
+              <header className="w-[85%] mx-auto text-center mt-3 mb-8 overflow-hidden">
+                <h1 className="text-xl sm:text-3xl font-extrabold text-yellow-400 
+                               drop-shadow-[0_0_10px_rgba(250,204,21,0.8)] mb-2 whitespace-nowrap">
+                  눈치코치 상담 편의점
+                </h1>
+                <p className="text-[10px] sm:text-[15px] text-blue-400 whitespace-nowrap">
+                  {subtitleText}
+                </p>
+                <div className="w-full h-1 bg-yellow-400 mt-6"></div>
+              </header>
+
+              {/* Navigation Menu (Vending Machine Buttons) */}
+              <nav className="w-[85%] mx-auto space-y-4"> 
+                {vendingMachineButtons.map((button, index) => (
+                  <div key={index} className="relative w-full">
+                    {/* "무료" (Free) blinking badge */}
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 bg-red-500 rounded-full w-12 h-12 flex items-center justify-center animate-pulse z-10 border border-black">
+                      <span className="text-white text-sm font-bold">무료</span>
+                    </div>
+                    <button
+                      onClick={() => window.location.href = button.url}
+                      className={`w-full py-5 pl-16 text-white text-xl font-bold rounded-3xl shadow-lg 
+                                  transition-all duration-300 ease-out 
+                                  ${button.colorClass} relative`}
+                    >
+                      {renderHighlightedText(button.label)}
+                    </button>
+                  </div>
+                ))}
+              </nav>
+
+              {/* Bottom Divider */}
+              <div className="w-[85%] mx-auto mt-8 mb-6">
+                <div className="w-full h-1 bg-yellow-400"></div>
+              </div>
+
+              {/* Action Buttons Group */}
+              <div className="w-[85%] mx-auto space-y-4">
+                {/* Buy Coffee Button */}
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={handleCoffeeClick}
+                    className="w-full py-3 px-6 bg-yellow-600 hover:bg-yellow-500 border-b-4 border-yellow-800 
+                              active:translate-y-1 active:border-b-0 text-black font-bold rounded-2xl shadow-lg 
+                              transition-all duration-300 ease-out flex items-center justify-center gap-3"
+                  >
+                    {/* Custom Outline Paper Cup SVG with Solid Sleeve */}
+                    <div className="animate-float">
+                      <svg width="24" height="28" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Cup Outline */}
+                        <path d="M6 10L18 10L16 26H8L6 10Z" stroke="black" strokeWidth="1.5" fill="none"/>
+                        {/* Solid Holder (Sleeve) */}
+                        <path d="M6.6 15L17.4 15L16.6 21H7.4L6.6 15Z" fill="black"/>
+                        {/* Lid Outline */}
+                        <rect x="5" y="6" width="14" height="4" rx="1" stroke="black" strokeWidth="1.5" fill="none"/>
+                        <rect x="9" y="3" width="6" height="3" rx="0.5" stroke="black" strokeWidth="1.5" fill="none"/>
+                      </svg>
+                    </div>
+                    <span className="text-sm sm:text-base whitespace-nowrap font-extrabold">도움이 되었다면 주인장에게 커피 쏘기</span>
+                  </button>
+                  
+                  {/* Coffee Message Box */}
+                  {showCoffeeMsg && (
+                    <div className="w-full py-4 px-5 bg-gray-800 text-gray-200 rounded-2xl shadow-inner border border-gray-700 transition-all duration-300">
+                      <p 
+                        className="text-[9px] sm:text-[11px] mb-1 text-left whitespace-nowrap"
+                      >
+                        후원금은 서버 운영에 큰 힘이 됩니다. 감사합니다!
+                      </p>
+                      <div className="w-full border-t border-gray-600 my-2"></div>
+                      <div className="flex justify-between items-center w-full">
+                        <div className="text-[12px] sm:text-[14px] text-left leading-tight">
+                          <p>눈치코치 팩토리: 토스뱅크</p>
+                          <p className="font-bold text-yellow-400">1002-4188-2942</p>
+                        </div>
+                        <button
+                          onClick={handleCopyAccount}
+                          className={`px-3 py-2 sm:py-2.5 text-[10px] sm:text-xs font-bold rounded-lg transition-all duration-300 shadow-md ${
+                            copied ? 'bg-green-600 text-white' : 'bg-gray-600 hover:bg-gray-500 text-white'
+                          }`}
+                        >
+                          {copied ? '복사 완료V' : '계좌 복사'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Split Button Container */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Factory Button */}
+                  <button
+                    onClick={() => window.open('https://nunchicoach.com/', '_blank')}
+                    style={{ backgroundColor: '#AA1446', color: '#73B82D', borderBottomColor: '#7A0E32' }}
+                    className="w-full py-3 px-2 border-b-4 
+                              active:translate-y-1 active:border-b-0 font-black rounded-2xl shadow-lg 
+                              transition-all duration-300 ease-out flex items-center justify-center text-xl tracking-normal"
+                  >
+                    Factory
+                  </button>
+
+                  {/* S . S . S Button */}
+                  <button
+                    onClick={handleSSSClick}
+                    style={{ backgroundColor: '#AA1446', color: '#73B82D', borderBottomColor: '#7A0E32' }}
+                    className="w-full py-3 px-2 border-b-4 
+                              active:translate-y-1 active:border-b-0 font-black rounded-2xl shadow-lg 
+                              transition-all duration-300 ease-out flex items-center justify-center text-xl tracking-tighter sm:tracking-widest"
+                  >
+                    S . S . S
+                  </button>
+                </div>
+              </div>
             </div>
-            <button
-              onclick="window.location.href='https://fortune.nunchicoach.com'"
-              class="w-full py-5 pl-16 text-white text-xl font-bold rounded-3xl shadow-lg 
-                     transition-all duration-300 ease-out 
-                     bg-purple-600 hover:bg-purple-500 border-b-4 border-purple-800 active:translate-y-1 active:border
+
+            {/* Footer (Business Info) */}
+            <footer className="text-center text-gray-500 text-xs mt-8 mb-2 flex flex-col items-center">
+              <div className="w-full px-2 flex flex-col items-center">
+                {/* Stable container that defines width based on copyright text */}
+                <div className="flex flex-col items-center w-fit mb-2">
+                  <p className="whitespace-nowrap mb-2">
+                    © 2026 눈치코치 팩토리. All Rights Reserved.
+                  </p>
+                  <button 
+                    onClick={() => setShowInfo(!showInfo)}
+                    className="w-full h-[5mm] px-0 bg-gray-600 hover:bg-gray-500 text-white text-[10px] flex items-center justify-center transition-colors rounded-sm"
+                  >
+                    이용 안내 및 사업자 정보 more {showInfo ? '▲' : '▼'}
+                  </button>
+                </div>
+                
+                {showInfo && (
+                  <div className="w-full p-4 bg-[#FDF8FC] text-left text-gray-700 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="mb-4">
+                      <h3 className="text-[12px] font-bold text-gray-900 mb-2">1. 서비스 이용 안내 및 면책 공고</h3>
+                      <div className="text-[10px] sm:text-[11px] leading-relaxed space-y-1 text-gray-600">
+                        <p>- 눈치코치 팩토리가 제작한 '눈치코치 상담 편의점'의 모든 콘텐츠(운세, 해몽, 선물, 메뉴, 주역, 행운 자판기 등)는 AI 기술을 활용한 오락 및 참고용입니다.</p>
+                        <p>- 본 서비스는 전문적인 상담을 대체할 수 없으며, 사용자의 주관적인 해석이나 결정으로 인해 발생하는 결과에 대해 당사는 어떠한 법적 책임도 지지 않음을 알려드립니다.</p>
+                        <p>- 사용자가 입력한 모든 개인 정보 및 데이터는 저장되지 않으며 결과 생성 즉시 파기됩니다.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <h3 className="text-[12px] font-bold text-gray-900 mb-2">2. 사업자 정보</h3>
+                      <div className="text-[10px] sm:text-[11px] leading-relaxed space-y-0.5 text-gray-700">
+                        <div className="flex"><span className="w-16 font-bold shrink-0">회사명:</span><span>눈치코치 팩토리 (NunchiCoach Factory)</span></div>
+                        <div className="flex"><span className="w-16 font-bold shrink-0">대표:</span><span>백종옥</span></div>
+                        <div className="flex"><span className="w-16 font-bold shrink-0">사업자번호:</span><span>363-33-01664</span></div>
+                        <div className="flex"><span className="w-16 font-bold shrink-0">주소:</span><span>(61097)광주광역시 북구 동림용산로12</span></div>
+                        <div className="flex"><span className="w-16 font-bold shrink-0">이메일:</span><span>nunchicoach-factory@naver.com</span></div>
+                        <div className="flex"><span className="w-16 font-bold shrink-0">계좌:</span><span>토스뱅크 1002-4188-2942</span></div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-left pt-3 border-t border-gray-200 mt-2">
+                      <p className="text-[10px] font-bold text-gray-600 tracking-tight whitespace-nowrap">
+                        Copyright © 2026 눈치코치 팩토리. All Rights Reserved.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </footer>
+          </div>
+        </div>
+      );
+    };
+
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>
